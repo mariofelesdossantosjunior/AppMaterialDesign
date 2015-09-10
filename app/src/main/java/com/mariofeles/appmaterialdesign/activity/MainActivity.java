@@ -17,6 +17,11 @@ import com.mariofeles.appmaterialdesign.fragment.FriendsFragment;
 import com.mariofeles.appmaterialdesign.fragment.HomeFragment;
 import com.mariofeles.appmaterialdesign.fragment.MessagesFragment;
 
+
+/**
+ * Created by Mario Feles dos Santos Junior on 10/09/15.
+ */
+
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
     private static String TAG = MainActivity.class.getSimpleName();

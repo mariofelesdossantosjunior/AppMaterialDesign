@@ -17,7 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Created by mario on 10/09/15.
+ * Created by Mario Feles dos Santos Junior on 10/09/15.
  */
 public class ActivityLogin extends Activity {
 
