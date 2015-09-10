@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         setSupportActionBar(mToolbar);
 
-        //deu certo
+        //Agora vai
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         drawerFragment = (FragmentDrawer)
