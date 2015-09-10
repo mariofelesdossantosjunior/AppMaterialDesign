@@ -21,8 +21,6 @@ import com.mariofeles.appmaterialdesign.fragment.MessagesFragment;
 /**
  * Created by Mario Feles dos Santos Junior on 10/09/15.
  */
-//TESTE GITHUB
-
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
     private static String TAG = MainActivity.class.getSimpleName();
@@ -34,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+         //Teste Git
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(mToolbar);
