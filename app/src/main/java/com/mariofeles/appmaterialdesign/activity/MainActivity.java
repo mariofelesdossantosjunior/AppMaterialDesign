@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         setSupportActionBar(mToolbar);
 
-        //Mario Teste Git
+        //Ola este é o primeiro teste do github mario
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         drawerFragment = (FragmentDrawer)
