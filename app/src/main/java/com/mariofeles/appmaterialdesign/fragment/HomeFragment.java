@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,7 +21,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnItemSelected;
+import butterknife.OnClick;
 
 /**
  * Created by Mario Feles Dos Santos junior on 10/09/15.
@@ -28,6 +30,8 @@ public class HomeFragment extends Fragment {
 
     @Bind(R.id.spNumeros)
     Spinner spNumeros;
+    @Bind(R.id.btLigar)
+    Button btLigar;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -46,9 +50,17 @@ public class HomeFragment extends Fragment {
 
         // Inflate the layout for this fragment
         ButterKnife.bind(this, rootView);
-
         montaSpinner();
         return rootView;
+    }
+
+    @OnClick(R.id.btLigar)
+    public void clickLigar() {
+        Intent irParaDiscagem = new Intent(Intent.ACTION_CALL);
+        Uri discarPara = Uri.parse("tel:" + spNumeros.getSelectedItem());
+        Toast.makeText(getActivity(), "Ligando Para : " + spNumeros.getSelectedItem(), Toast.LENGTH_LONG).show();
+        irParaDiscagem.setData(discarPara);
+        startActivity(irParaDiscagem);
     }
 
     private void montaSpinner() {
@@ -61,18 +73,7 @@ public class HomeFragment extends Fragment {
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, ls);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spNumeros.setAdapter(dataAdapter);
-
     }
-
-    @OnItemSelected(R.id.spNumeros)
-    public void itemSel() {
-        Intent irParaDiscagem = new Intent(Intent.ACTION_CALL);
-        Uri discarPara = Uri.parse("tel:" + spNumeros.getSelectedItem());
-        Toast.makeText(getActivity(), "Ligando Para : " + spNumeros.getSelectedItem(), Toast.LENGTH_LONG).show();
-        irParaDiscagem.setData(discarPara);
-        startActivity(irParaDiscagem);
-    }
-
 
     @Override
     public void onAttach(Activity activity) {

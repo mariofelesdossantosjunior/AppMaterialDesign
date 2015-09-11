@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.mariofeles.appmaterialdesign.R;
 import com.mariofeles.appmaterialdesign.fragment.FriendsFragment;
 import com.mariofeles.appmaterialdesign.fragment.HomeFragment;
@@ -45,8 +44,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         // display the first navigation drawer view on app launch
         displayView(0);
-    }
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
