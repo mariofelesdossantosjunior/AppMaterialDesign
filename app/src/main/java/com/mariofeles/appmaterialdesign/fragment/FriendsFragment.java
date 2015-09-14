@@ -3,6 +3,7 @@ package com.mariofeles.appmaterialdesign.fragment;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -98,7 +99,9 @@ public class FriendsFragment extends Fragment {
         dialog.setContentView(R.layout.dialog_new_friend);
         dialog.setTitle(R.string.newfriend);
         EditText etName = (EditText) dialog.findViewById(R.id.vNameFriend);
+        etName.getBackground().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
         EditText etFone = (EditText) dialog.findViewById(R.id.vFoneFriend);
+        etFone.getBackground().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
         Button btCancel = (Button) dialog.findViewById(R.id.btCancelFriend);
         Button btSave = (Button) dialog.findViewById(R.id.btSaveFriend);
         btCancel.setOnClickListener(new View.OnClickListener() {
