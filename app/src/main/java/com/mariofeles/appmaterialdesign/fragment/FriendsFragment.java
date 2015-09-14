@@ -1,20 +1,39 @@
 package com.mariofeles.appmaterialdesign.fragment;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.internal.widget.ListViewCompat;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.internal.MDTintHelper;
 import com.mariofeles.appmaterialdesign.R;
+import com.mariofeles.appmaterialdesign.dao.DatabaseHelper;
+import com.mariofeles.appmaterialdesign.dao.FriendDao;
+import com.mariofeles.appmaterialdesign.model.Friend;
 import com.melnykov.fab.FloatingActionButton;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +48,16 @@ public class FriendsFragment extends Fragment {
 
 
     @Bind(R.id.lvFriends)
-    ListViewCompat lvFriends;
+    ListView lvFriends;
     @Bind(R.id.faButtonNewFriend)
     FloatingActionButton faBtNewFriend;
 
     View v;
-    List<String> lsFriends;
+    private DatabaseHelper dh;
+    private FriendDao friendDao;
+    private List<Friend> friendList = new ArrayList<>();
+    private Friend friend;
+
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -50,9 +73,18 @@ public class FriendsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_friends, container, false);
+
+
+        //Base Dados
+        try {
+            dh = new DatabaseHelper(getActivity());
+            friendDao = new FriendDao(dh.getConnectionSource());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         // Inflate the layout for this fragment
         ButterKnife.bind(this, v);
-
         faBtNewFriend.attachToListView(lvFriends);
 
         alimentaListView();
@@ -62,32 +94,41 @@ public class FriendsFragment extends Fragment {
 
     @OnClick(R.id.faButtonNewFriend)
     public void clickNewFriend() {
-        Toast.makeText(getActivity(), "New Friend", Toast.LENGTH_LONG).show();
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.dialog_new_friend);
+        dialog.setTitle(R.string.newfriend);
+        EditText etName = (EditText) dialog.findViewById(R.id.vNameFriend);
+        EditText etFone = (EditText) dialog.findViewById(R.id.vFoneFriend);
+        Button btCancel = (Button) dialog.findViewById(R.id.btCancelFriend);
+        Button btSave = (Button) dialog.findViewById(R.id.btSaveFriend);
+        btCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(),"SALVAR",Toast.LENGTH_LONG).show();
+            }
+        });
+        dialog.show();
+
     }
 
     private void alimentaListView() {
-        lvFriends.setAdapter(null);
-
-        lsFriends = new ArrayList<>();
-        //Colocando alguns nomes na lista
-        lsFriends.add("Mario");
-        lsFriends.add("Jose");
-        lsFriends.add("Pedro");
-        lsFriends.add("Juninho");
-        lsFriends.add("Mario");
-        lsFriends.add("Jose");
-        lsFriends.add("Pedro");
-        lsFriends.add("Juninho");
-        lsFriends.add("Mario");
-        lsFriends.add("Jose");
-        lsFriends.add("Pedro");
-        lsFriends.add("Juninho");
-
-        FriendAdaper adapter = new FriendAdaper(lsFriends);
-        lvFriends.setAdapter(adapter);
-
-
+        try {
+            lvFriends.setAdapter(null);
+            friendList = friendDao.queryForAll();
+            FriendAdaper adapter = new FriendAdaper(friendList);
+            lvFriends.setAdapter(adapter);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -109,9 +150,9 @@ public class FriendsFragment extends Fragment {
     ////////////////////////////CLASSES////////////////////////////
     ///////////////////////////////////////////////////////////////
     public class FriendAdaper extends BaseAdapter {
-        private List<String> list;
+        private List<Friend> list;
 
-        public FriendAdaper(List<String> list) {
+        public FriendAdaper(List<Friend> list) {
             this.list = list;
             ButterKnife.bind(this,v);
         }
@@ -136,11 +177,12 @@ public class FriendsFragment extends Fragment {
             ViewHolder holder;
             LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.adap_friend, null);
-            final String nome = list.get(position);
+
+            final Friend fd = list.get(position);
 
             holder = new ViewHolder(view);
 
-            holder.tvFriAda.setText(nome);
+            holder.tvFriAda.setText(fd.getNome());
 
 
 
@@ -153,7 +195,7 @@ public class FriendsFragment extends Fragment {
          *
          * @author ButterKnifeZelezny, plugin for Android Studio by Avast Developers (http://github.com/avast)
          */
-         class ViewHolder {
+        class ViewHolder {
             @Bind(R.id.tvFriAda)
             TextView tvFriAda;
 
