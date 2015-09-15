@@ -3,44 +3,34 @@ package com.mariofeles.appmaterialdesign.fragment;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.internal.widget.ListViewCompat;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.internal.MDTintHelper;
 import com.mariofeles.appmaterialdesign.R;
 import com.mariofeles.appmaterialdesign.dao.DatabaseHelper;
 import com.mariofeles.appmaterialdesign.dao.FriendDao;
 import com.mariofeles.appmaterialdesign.model.Friend;
+import com.mariofeles.appmaterialdesign.util.Mask;
 import com.melnykov.fab.FloatingActionButton;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
+import butterknife.OnItemLongClick;
 
 /**
  * Created by Mario Feles dos Santos Junior on 10/09/15.
@@ -93,17 +83,49 @@ public class FriendsFragment extends Fragment {
         return v;
     }
 
-    @OnClick(R.id.faButtonNewFriend)
-    public void clickNewFriend() {
+    @OnItemLongClick(R.id.lvFriends)
+    boolean editFriend(int position){
+        friend = friendList.get(position);
+        createDialog();
+        return true;
+    }
+
+    @OnItemClick(R.id.lvFriends)
+    void callPhone(int position){
+        friend = friendList.get(position);
+        Intent irParaDiscagem = new Intent(Intent.ACTION_CALL);
+        Uri discarPara = Uri.parse("tel:" + friend.getTelefone());
+        irParaDiscagem.setData(discarPara);
+        startActivity(irParaDiscagem);
+    }
+
+    private void createDialog() {
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_new_friend);
         dialog.setTitle(R.string.newfriend);
-        EditText etName = (EditText) dialog.findViewById(R.id.vNameFriend);
+        final EditText etName = (EditText) dialog.findViewById(R.id.vNameFriend);
         etName.getBackground().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
-        EditText etFone = (EditText) dialog.findViewById(R.id.vFoneFriend);
+        final EditText etFone = (EditText) dialog.findViewById(R.id.vFoneFriend);
         etFone.getBackground().setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
+        etFone.addTextChangedListener(Mask.insert("(###)####-####",etFone));
         Button btCancel = (Button) dialog.findViewById(R.id.btCancelFriend);
         Button btSave = (Button) dialog.findViewById(R.id.btSaveFriend);
+        Button btRemove = (Button) dialog.findViewById(R.id.btRemoveFriend);
+
+
+        if(friend != null){
+            Log.i("mario", "IF FRIEND RECUPER: " + friend.toString());
+            etName.setText(friend.getNome());
+            etFone.setText(friend.getTelefone());
+            btRemove.setVisibility(View.VISIBLE);
+
+        }else{
+            btRemove.setVisibility(View.GONE);
+            friend = new Friend();
+            Log.i("mario","ELSE FRIEND RECUPER: "+friend.toString());
+
+        }
+
         btCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,12 +135,55 @@ public class FriendsFragment extends Fragment {
         btSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(),"SALVAR",Toast.LENGTH_LONG).show();
+                friend.setNome(etName.getText().toString());
+                friend.setTelefone(etFone.getText().toString());
+                if(!friend.getNome().equals("") || !friend.getTelefone().equals("")){
+                    mergeFriend(friend);
+                }
+                dialog.dismiss();
+                alimentaListView();
+
+            }
+        });
+        btRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeFriend(friend);
+                dialog.dismiss();
+                alimentaListView();
             }
         });
         dialog.show();
+    }
+
+    @OnClick(R.id.faButtonNewFriend)
+    public void clickNewFriend() {
+        friend = null;
+        createDialog();
+    }
+    private void mergeFriend(Friend friend) {
+        try {
+            if(friendDao.queryForId(friend.getId()) == null){
+                friendDao.create(friend);
+                Log.i("mario","Friend new: "+friend.toString());
+            }else{
+                friendDao.update(friend);
+                Log.i("mario", "Friend update: " + friend.toString());
+            }
+        }catch (Exception e){
+            Log.i("erro","error: "+e.getMessage());
+        }
 
     }
+
+    private void removeFriend(Friend friend){
+        try {
+            friendDao.delete(friend);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void alimentaListView() {
         try {
@@ -186,8 +251,6 @@ public class FriendsFragment extends Fragment {
             holder = new ViewHolder(view);
 
             holder.tvFriAda.setText(fd.getNome());
-
-
 
             return view;
         }

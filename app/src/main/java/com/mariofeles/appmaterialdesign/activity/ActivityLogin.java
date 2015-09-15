@@ -44,7 +44,7 @@ public class ActivityLogin extends Activity {
     private void login() {
         Log.i("mario", "USER: " + etUser.getText());
         Log.i("mario", "SENHA: " + etSenha.getText());
-        if(etUser.getText().toString().equals("testeUser") && etSenha.getText().toString().equals("123456")){
+        if(etUser.getText().toString().equals("user") && etSenha.getText().toString().equals("123")){
             Intent i = new Intent(ActivityLogin.this,MainActivity.class);
             startActivity(i);
             finish();
